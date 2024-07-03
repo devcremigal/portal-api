@@ -28,9 +28,9 @@ export class Invoice {
   @Column({ length: 12 })
   invoiceNumber: string;
 
-  @Column()
+  @Column({ type: 'decimal', precision: 18, scale: 2 })
   originalValue: number;
 
-  @Column()
+  @Column({ type: 'decimal', precision: 18, scale: 2 })
   balance: number;
 }

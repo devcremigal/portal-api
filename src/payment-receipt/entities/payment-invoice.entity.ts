@@ -24,6 +24,6 @@ export class PaymentInvoice {
   @JoinColumn({ name: 'invoiceId' })
   invoice: Invoice;
 
-  @Column()
+  @Column({ type: 'decimal', precision: 18, scale: 2 })
   paymentValue: number;
 }

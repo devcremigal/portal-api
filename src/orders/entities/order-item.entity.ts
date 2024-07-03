@@ -21,12 +21,12 @@ export class OrderItem {
   @JoinColumn({ name: 'productId' })
   product: Product;
 
-  @Column()
+  @Column({ type: 'decimal', precision: 10, scale: 2 })
   qty: number;
 
-  @Column()
+  @Column({ type: 'decimal', precision: 10, scale: 2 })
   price: number;
 
-  @Column()
+  @Column({ type: 'decimal', precision: 14, scale: 2 })
   total: number;
 }

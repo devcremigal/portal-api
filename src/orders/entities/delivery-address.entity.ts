@@ -21,10 +21,10 @@ export class DeliveryAddress {
   @Column({ length: 255 })
   address: string;
 
-  @Column()
+  @Column({ type: 'decimal', precision: 10, scale: 6 })
   lat: number;
 
-  @Column()
+  @Column({ type: 'decimal', precision: 10, scale: 6 })
   long: number;
 
   @Column({ length: 20 })

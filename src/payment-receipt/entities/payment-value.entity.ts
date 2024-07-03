@@ -27,7 +27,7 @@ export class PaymentValue {
   @Column({ length: 12 })
   number: string;
 
-  @Column()
+  @Column({ type: 'decimal', precision: 18, scale: 2 })
   value: number;
 
   @Column()

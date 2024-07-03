@@ -10,7 +10,7 @@ export class Product {
   @Column({ length: 15 })
   code: string;
 
-  @Column({ length: 10 })
+  @Column({ length: 15 })
   shortCode: string;
 
   @Column({ length: 15 })
@@ -27,6 +27,9 @@ export class Product {
 
   @Column()
   coef: number;
+
+  @Column()
+  boxesVal: number;
 
   @OneToMany(() => PriceTableItem, (priceTableItem) => priceTableItem.product)
   priceTableItems: PriceTableItem[];

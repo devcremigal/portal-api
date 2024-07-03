@@ -18,6 +18,6 @@ export class PriceTableItem {
   @JoinColumn({ name: 'productId' }) // Relación con la entidad PriceTable
   product: Product;
 
-  @Column()
+  @Column({ type: 'decimal', precision: 10, scale: 2 })
   price: number;
 }
