@@ -83,6 +83,8 @@ export class OrdersService {
         const orderItem = new OrderItem();
         orderItem.product = product;
         orderItem.qty = item.quantity;
+        orderItem.price = item.price;
+        orderItem.total = item.total;
         orderItems.push(orderItem);
       }
       order.orderItems = orderItems;

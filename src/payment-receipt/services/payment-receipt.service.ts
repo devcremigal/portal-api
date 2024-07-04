@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { CreatePaymentReceiptDto } from '../dtos/create-payment-receipt.dto';
+import { CreatePaymentReceiptDto } from '../dtos/payment-receipt.dto';
 import { UpdatePaymentReceiptDto } from '../dtos/update-payment-receipt.dto';
 
 @Injectable()

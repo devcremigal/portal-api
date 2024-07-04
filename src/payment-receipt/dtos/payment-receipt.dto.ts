@@ -7,12 +7,13 @@ import {
   ValidateNested,
   IsOptional,
   ArrayNotEmpty,
+  IsNotEmpty,
 } from 'class-validator';
-import { CreatePaymentInvoiceDto } from './create-payment-invoice.dto';
-import { CreatePaymentValueDto } from './create-payment-value.dto';
+import { CreatePaymentInvoiceDto } from './payment-invoice.dto';
+import { CreatePaymentValueDto } from './payment-value.dto';
 
 export class CreatePaymentReceiptDto {
-  @IsInt()
+  @IsInt({ message: 'El código de usuario debera ser numerico.' })
   userId: number;
 
   @IsDateString()
@@ -22,7 +23,8 @@ export class CreatePaymentReceiptDto {
   @Length(8, 8)
   time: string;
 
-  @IsInt()
+  @IsInt({ message: 'El código del cliente debera ser numerico.' })
+  @IsNotEmpty({ message: 'El código del cliente es obligatorio.' })
   customerId: number;
 
   @IsInt()
@@ -39,6 +41,6 @@ export class CreatePaymentReceiptDto {
 
   @ValidateNested({ each: true })
   @Type(() => CreatePaymentValueDto)
-  @ArrayNotEmpty()
+  @ArrayNotEmpty({ message: 'No se informo ninguna forma de pago.' })
   paymentValues: CreatePaymentValueDto[];
 }
