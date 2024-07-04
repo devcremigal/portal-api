@@ -9,6 +9,7 @@ import { DeliveryAddress } from './entities/delivery-address.entity';
 import { PriceTable } from './entities/price-table.entity';
 import { PriceTableItem } from './entities/price-table-item.entity';
 import { Product } from './entities/product.entity';
+import { Customer } from 'src/users/entities/customer.entity';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { Product } from './entities/product.entity';
       PriceTable,
       PriceTableItem,
       Product,
+      Customer,
     ]),
   ],
   controllers: [OrdersController],
