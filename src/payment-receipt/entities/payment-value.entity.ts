@@ -61,7 +61,7 @@ export class PaymentValue {
   chkIdCuit: number;
 
   @Column()
-  ckkIdDNI: number;
+  chkIdDNI: number;
 
   @Column({ length: 100 })
   obs: string;

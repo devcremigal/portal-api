@@ -17,7 +17,7 @@ export class CreatePaymentReceiptDto {
   userId: number;
 
   @IsDateString()
-  date: string;
+  date: Date;
 
   @IsString()
   @Length(8, 8)
@@ -37,7 +37,7 @@ export class CreatePaymentReceiptDto {
   @ValidateNested({ each: true })
   @Type(() => CreatePaymentInvoiceDto)
   @IsOptional()
-  paymentInvoice?: CreatePaymentInvoiceDto;
+  paymentInvoices?: CreatePaymentInvoiceDto[];
 
   @ValidateNested({ each: true })
   @Type(() => CreatePaymentValueDto)

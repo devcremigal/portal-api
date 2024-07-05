@@ -69,7 +69,7 @@ export class CreatePaymentValueDto {
 
   @IsInt()
   @IsOptional()
-  ckkIdDNI?: number;
+  chkIdDNI?: number;
 
   @IsString()
   @Length(0, 100)

@@ -18,5 +18,6 @@ import { SellersController } from './controllers/sellers.controller';
   imports: [TypeOrmModule.forFeature([User, Seller, Customer, PriceTable])],
   controllers: [UsersController, CustomersController, SellersController],
   providers: [UsersService, CustomersService, SellerService],
+  exports: [UsersService, CustomersService, SellerService],
 })
 export class UsersModule {}
