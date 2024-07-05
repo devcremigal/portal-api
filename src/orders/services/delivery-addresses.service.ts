@@ -1,21 +1,29 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+
 import { DeliveryAddress } from '../entities/delivery-address.entity';
 import {
   CreateDeliveryAddressDto,
   UpdateDeliveryAddressDto,
 } from '../dtos/delivery-address.dto';
 
+import { CustomersService } from 'src/users/services/customers.service';
+
 @Injectable()
 export class DeliveryAddressesService {
   constructor(
     @InjectRepository(DeliveryAddress)
     private deliveryAddressRepo: Repository<DeliveryAddress>,
+    private customerService: CustomersService,
   ) {}
 
   async create(data: CreateDeliveryAddressDto) {
+    const customer = await this.customerService.findOne(data.customerId);
+
     const deliveryAddress = this.deliveryAddressRepo.create(data);
+    deliveryAddress.customer = customer;
+
     return this.deliveryAddressRepo.save(deliveryAddress);
   }
 

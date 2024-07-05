@@ -1,14 +1,20 @@
 import {
   IsNotEmpty,
-  IsDateString,
   ValidateNested,
   ArrayMinSize,
   IsInt,
+  IsOptional,
+  IsString,
+  IsDate,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 import { CreateOrderItemDto } from './order-item.dto';
 
 export class CreateOrderDto {
+  @IsInt({ message: 'El código del usuario debera ser numerico.' })
+  @IsNotEmpty({ message: 'El código del usuario es obligatorio.' })
+  userId: number;
+
   @IsInt({ message: 'El código del cliente debera ser numerico.' })
   @IsNotEmpty({ message: 'El código del cliente es obligatorio.' })
   customerId: number;
@@ -17,9 +23,23 @@ export class CreateOrderDto {
   @IsNotEmpty({ message: 'La dirección de entrega es obligatoria.' })
   deliveryAddressId: number;
 
-  @IsDateString({}, { message: 'La fecha debe ser una fecha válida.' })
+  @Type(() => Date)
+  @IsDate({ message: 'La fecha debe ser una fecha válida.' })
   @IsNotEmpty({ message: 'La fecha es obligatoria' })
   date: Date;
+
+  @Type(() => Date)
+  @IsDate({ message: 'La fecha de entrega debe ser una fecha válida.' })
+  @IsNotEmpty({ message: 'La fecha de entrega es obligatoria' })
+  deliveryDate: Date;
+
+  @IsOptional()
+  @IsString()
+  obs: string;
+
+  @IsOptional()
+  @IsString()
+  intObs: string;
 
   @ValidateNested({ each: true })
   @Type(() => CreateOrderItemDto)

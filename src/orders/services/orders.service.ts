@@ -7,6 +7,7 @@ import { OrderItem } from '../entities/order-item.entity';
 
 import { CreateOrderDto } from '../dtos/order.dto';
 
+import { UsersService } from 'src/users/services/users.service';
 import { CustomersService } from 'src/users/services/customers.service';
 import { DeliveryAddressesService } from './delivery-addresses.service';
 import { ProductsService } from './products.service';
@@ -15,21 +16,37 @@ import { ProductsService } from './products.service';
 export class OrdersService {
   constructor(
     @InjectRepository(Order) private orderRepo: Repository<Order>,
-    private deliveryAddressService: DeliveryAddressesService,
+    @InjectRepository(OrderItem) private orderItemRepo: Repository<OrderItem>,
+    private userService: UsersService,
     private customerService: CustomersService,
+    private deliveryAddressService: DeliveryAddressesService,
     private productService: ProductsService,
   ) {}
 
   async create(data: CreateOrderDto) {
+    const user = await this.userService.findOne(data.userId);
     const customer = await this.customerService.findOne(data.customerId);
     const deliveryAddress = await this.deliveryAddressService.findOne(
       data.deliveryAddressId,
     );
 
+    const now = new Date();
+    const hours = now.getHours().toString().padStart(2, '0');
+    const minutes = now.getMinutes().toString().padStart(2, '0');
+    const seconds = now.getSeconds().toString().padStart(2, '0');
+
     const order = new Order();
     order.date = data.date;
+    order.user = user;
+    order.time = `${hours}:${minutes}:${seconds}`;
     order.customer = customer;
+    order.deliveryDate = data.deliveryDate;
     order.deliveryAddress = deliveryAddress;
+    order.obs = data.obs;
+    order.state = 1;
+    order.intObs = data.intObs;
+
+    const savedOrder = await this.orderRepo.save(order);
 
     const orderItems = [];
     for (const item of data.orderItems) {
@@ -37,11 +54,15 @@ export class OrdersService {
       const orderItem = new OrderItem();
       orderItem.product = product;
       orderItem.qty = item.quantity;
+      orderItem.price = item.price;
+      orderItem.total = item.total;
+      orderItem.order = savedOrder;
       orderItems.push(orderItem);
     }
 
-    order.orderItems = orderItems;
-    return this.orderRepo.save(order);
+    await this.orderItemRepo.save(orderItems); // Guardar los orderItems
+
+    return savedOrder;
   }
 
   findAll() {
@@ -65,7 +86,7 @@ export class OrdersService {
     const order = await this.findOne(id);
 
     if (changes.customerId) {
-      order.customer = await this.customerService.findOne(id);
+      order.customer = await this.customerService.findOne(changes.customerId);
     }
 
     if (changes.deliveryAddressId) {
@@ -74,7 +95,13 @@ export class OrdersService {
       );
     }
 
+    Object.assign(order, changes);
+    const savedOrder = await this.orderRepo.save(order);
+
     if (changes.orderItems && changes.orderItems.length > 0) {
+      // Eliminar los antiguos orderItems
+      await this.orderItemRepo.delete({ order: { id: savedOrder.id } });
+
       const orderItems = [];
 
       for (const item of changes.orderItems) {
@@ -84,13 +111,14 @@ export class OrdersService {
         orderItem.qty = item.quantity;
         orderItem.price = item.price;
         orderItem.total = item.total;
+        orderItem.order = savedOrder;
         orderItems.push(orderItem);
       }
-      order.orderItems = orderItems;
+      changes.orderItems = orderItems;
+      await this.orderItemRepo.save(orderItems); // Guardar los orderItems
     }
 
-    Object.assign(order, changes);
-    return this.orderRepo.save(order);
+    return savedOrder;
   }
 
   remove(id: number) {

@@ -1,9 +1,9 @@
-import { IsString, IsNotEmpty, IsNumber } from 'class-validator';
+import { IsString, IsNotEmpty, IsNumber, IsInt } from 'class-validator';
 
 export class CreateDeliveryAddressDto {
   @IsNotEmpty()
-  @IsString()
-  readonly customerId: string;
+  @IsInt()
+  readonly customerId: number;
 
   @IsNotEmpty()
   @IsString()

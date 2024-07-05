@@ -1,6 +1,7 @@
 import {
   BadRequestException,
   Injectable,
+  NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -31,17 +32,23 @@ export class UsersService {
     return this.userRepo.save(user);
   }
 
-  findAll() {
+  async findAll() {
     return this.userRepo.find();
   }
 
-  findOne(id: number) {
-    return this.userRepo.findOne({
+  async findOne(id: number) {
+    const user = await this.userRepo.findOne({
       where: { id },
     });
+
+    if (!user) {
+      throw new NotFoundException(`No se encontro el usuario con el id ${id}`);
+    }
+
+    return user;
   }
 
-  findByEMail(email: string) {
+  async findByEMail(email: string) {
     return this.userRepo.findOne({
       where: { email },
     });
@@ -58,7 +65,7 @@ export class UsersService {
     return this.userRepo.save(user);
   }
 
-  remove(id: number) {
+  async remove(id: number) {
     return this.userRepo.delete(id);
   }
 

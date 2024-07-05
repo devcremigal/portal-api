@@ -4,7 +4,6 @@ import { Repository } from 'typeorm';
 
 import { PaymentReceipt } from '../entities/payment-receipt.entity';
 import { PaymentInvoice } from '../entities/payment-invoice.entity';
-import { Invoice } from '../entities/invoice.entity';
 import { PaymentValue } from '../entities/payment-value.entity';
 
 import { CreatePaymentReceiptDto } from '../dtos/payment-receipt.dto';
@@ -19,11 +18,6 @@ export class PaymentReceiptService {
   constructor(
     @InjectRepository(PaymentReceipt)
     private paymentReceiptRepo: Repository<PaymentReceipt>,
-    @InjectRepository(PaymentInvoice)
-    private paymentInvoiceRepo: Repository<PaymentInvoice>,
-    @InjectRepository(Invoice) private invoiceRepo: Repository<Invoice>,
-    @InjectRepository(PaymentValue)
-    private paymentValueRepo: Repository<PaymentValue>,
     private customerService: CustomersService,
     private userService: UsersService,
     private invoiceService: InvoicesService,
@@ -46,7 +40,9 @@ export class PaymentReceiptService {
     paymentReceipt.state = createPaymentReceiptDto.state;
     paymentReceipt.time = createPaymentReceiptDto.time;
 
+    //----------------------------------------
     // Guardar los valores de pago asociados
+    //----------------------------------------
     if (
       createPaymentReceiptDto.paymentValues &&
       createPaymentReceiptDto.paymentValues.length > 0
@@ -85,7 +81,9 @@ export class PaymentReceiptService {
       );
     }
 
-    // Actualizar el balance de las facturas
+    //----------------------------------------------------
+    // Si existe, cargo las facturas asociadas al recibo
+    //----------------------------------------------------
     if (
       createPaymentReceiptDto.paymentInvoices &&
       createPaymentReceiptDto.paymentInvoices.length > 0
@@ -108,7 +106,11 @@ export class PaymentReceiptService {
 
     const savedReceipt = await this.paymentReceiptRepo.save(paymentReceipt);
 
+    //---------------------------------------------
     // Actualizar el balance de las facturas
+    // Recorro de nuevo porque en esta instancia
+    // Me aseguro que el recibo se haya grabado
+    //---------------------------------------------
     if (
       createPaymentReceiptDto.paymentInvoices &&
       createPaymentReceiptDto.paymentInvoices.length > 0
@@ -134,7 +136,9 @@ export class PaymentReceiptService {
       throw new NotFoundException(`Recibo con ID ${id} no encontrado`);
     }
 
-    // Revertir el balance de las facturas
+    //---------------------------------------------
+    // Actualizar el balance de las facturas
+    //---------------------------------------------
     for (const paymentInvoice of paymentReceipt.paymentInvoices) {
       await this.invoiceService.updateBalance(
         paymentInvoice.invoice.id,
