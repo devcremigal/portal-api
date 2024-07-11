@@ -18,6 +18,10 @@ export class PaymentReceiptService {
   constructor(
     @InjectRepository(PaymentReceipt)
     private paymentReceiptRepo: Repository<PaymentReceipt>,
+    @InjectRepository(PaymentValue)
+    private paymentValueRepo: Repository<PaymentValue>,
+    @InjectRepository(PaymentInvoice)
+    private paymentInvoiceRepo: Repository<PaymentInvoice>,
     private customerService: CustomersService,
     private userService: UsersService,
     private invoiceService: InvoicesService,
@@ -36,9 +40,11 @@ export class PaymentReceiptService {
     paymentReceipt.customer = customer;
     paymentReceipt.user = user;
     paymentReceipt.date = createPaymentReceiptDto.date;
-    paymentReceipt.obs = createPaymentReceiptDto.obs;
-    paymentReceipt.state = createPaymentReceiptDto.state;
     paymentReceipt.time = createPaymentReceiptDto.time;
+    paymentReceipt.state = createPaymentReceiptDto.state;
+    paymentReceipt.obs = createPaymentReceiptDto.obs;
+
+    const savedReceipt = await this.paymentReceiptRepo.save(paymentReceipt);
 
     //----------------------------------------
     // Guardar los valores de pago asociados
@@ -56,8 +62,6 @@ export class PaymentReceiptService {
         );
 
         paymentValue.number = paymentValueDto.number;
-        paymentValue.value = paymentValueDto.value;
-        paymentValue.typePayment = typePayment;
         paymentValue.createDate = new Date(paymentValueDto.createDate);
         paymentValue.expirationDate = new Date(paymentValueDto.expirationDate);
         paymentValue.bankCode = paymentValueDto.bankCode;
@@ -70,11 +74,14 @@ export class PaymentReceiptService {
         paymentValue.chkIdCuit = paymentValueDto.chkIdCuit;
         paymentValue.chkIdDNI = paymentValueDto.chkIdDNI;
         paymentValue.obs = paymentValueDto.obs;
+        paymentValue.typePayment = typePayment;
+        paymentValue.value = paymentValueDto.value;
+        paymentValue.paymentReceipt = savedReceipt;
 
         paymentValues.push(paymentValue);
       }
 
-      paymentReceipt.paymentInvoices = paymentValues;
+      this.paymentValueRepo.save(paymentValues);
     } else {
       throw new NotFoundException(
         'El recibo debe tener al menos un valor de pago',
@@ -97,14 +104,13 @@ export class PaymentReceiptService {
           paymentInvoiceDto.invoiceId,
         );
         paymentInvoice.paymentValue = paymentInvoiceDto.paymentValue;
+        paymentInvoice.paymentReceipt = savedReceipt;
 
         paymentInvoices.push(paymentInvoice);
       }
 
-      paymentReceipt.paymentInvoices = paymentInvoices;
+      this.paymentInvoiceRepo.save(paymentInvoices);
     }
-
-    const savedReceipt = await this.paymentReceiptRepo.save(paymentReceipt);
 
     //---------------------------------------------
     // Actualizar el balance de las facturas
@@ -129,12 +135,14 @@ export class PaymentReceiptService {
   async remove(id: number) {
     const paymentReceipt = await this.paymentReceiptRepo.findOne({
       where: { id },
-      relations: ['paymentInvoices', 'paymentValues'],
+      relations: ['paymentInvoices.invoice'],
     });
 
     if (!paymentReceipt) {
       throw new NotFoundException(`Recibo con ID ${id} no encontrado`);
     }
+
+    console.log(paymentReceipt.paymentInvoices);
 
     //---------------------------------------------
     // Actualizar el balance de las facturas
@@ -146,6 +154,9 @@ export class PaymentReceiptService {
       );
     }
 
-    await this.paymentReceiptRepo.remove(paymentReceipt);
+    await this.paymentInvoiceRepo.delete({ paymentReceipt: { id } });
+    await this.paymentValueRepo.delete({ paymentReceipt: { id } });
+
+    return this.paymentReceiptRepo.delete(id);
   }
 }

@@ -95,7 +95,7 @@ export class OrdersService {
       );
     }
 
-    Object.assign(order, changes);
+    this.orderRepo.merge(order, changes);
     const savedOrder = await this.orderRepo.save(order);
 
     if (changes.orderItems && changes.orderItems.length > 0) {
@@ -114,6 +114,7 @@ export class OrdersService {
         orderItem.order = savedOrder;
         orderItems.push(orderItem);
       }
+
       changes.orderItems = orderItems;
       await this.orderItemRepo.save(orderItems); // Guardar los orderItems
     }
@@ -121,7 +122,8 @@ export class OrdersService {
     return savedOrder;
   }
 
-  remove(id: number) {
+  async remove(id: number) {
+    await this.orderItemRepo.delete({ order: { id } });
     return this.orderRepo.delete(id);
   }
 }

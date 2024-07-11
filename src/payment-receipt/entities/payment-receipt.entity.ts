@@ -20,7 +20,7 @@ export class PaymentReceipt {
   @JoinColumn({ name: 'userId' })
   user: User;
 
-  @Column()
+  @Column({ type: 'date' })
   date: Date;
 
   @Column({ length: 8 })

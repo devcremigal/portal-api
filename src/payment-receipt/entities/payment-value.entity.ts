@@ -30,10 +30,10 @@ export class PaymentValue {
   @Column({ type: 'decimal', precision: 18, scale: 2 })
   value: number;
 
-  @Column()
+  @Column({ type: 'date' })
   createDate: Date;
 
-  @Column()
+  @Column({ type: 'date' })
   expirationDate: Date;
 
   @Column({ length: 3 })
@@ -57,11 +57,11 @@ export class PaymentValue {
   @Column({ length: 10 })
   chkAccount: string;
 
-  @Column()
-  chkIdCuit: number;
+  @Column({ type: 'bigint', nullable: true })
+  chkIdCuit?: number;
 
-  @Column()
-  chkIdDNI: number;
+  @Column({ type: 'bigint', nullable: true })
+  chkIdDNI?: number;
 
   @Column({ length: 100 })
   obs: string;

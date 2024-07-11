@@ -1,6 +1,8 @@
+import { Type } from 'class-transformer';
 import {
-  IsDateString,
+  IsDate,
   IsInt,
+  IsNotEmpty,
   IsNumber,
   IsOptional,
   IsString,
@@ -22,10 +24,14 @@ export class CreatePaymentValueDto {
   @IsNumber()
   value: number;
 
-  @IsDateString()
-  createDate: string;
+  @Type(() => Date)
+  @IsDate({ message: 'La fecha debe ser una fecha válida.' })
+  @IsNotEmpty({ message: 'La fecha es obligatoria' })
+  createDate: Date;
 
-  @IsDateString()
+  @Type(() => Date)
+  @IsDate({ message: 'La fecha debe ser una fecha válida.' })
+  @IsNotEmpty({ message: 'La fecha es obligatoria' })
   expirationDate: string;
 
   @IsString()

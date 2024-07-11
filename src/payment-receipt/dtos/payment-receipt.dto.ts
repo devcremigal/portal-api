@@ -1,6 +1,6 @@
 import { Type } from 'class-transformer';
 import {
-  IsDateString,
+  IsDate,
   IsInt,
   IsString,
   Length,
@@ -16,7 +16,9 @@ export class CreatePaymentReceiptDto {
   @IsInt({ message: 'El código de usuario debera ser numerico.' })
   userId: number;
 
-  @IsDateString()
+  @Type(() => Date)
+  @IsDate({ message: 'La fecha debe ser una fecha válida.' })
+  @IsNotEmpty({ message: 'La fecha es obligatoria' })
   date: Date;
 
   @IsString()

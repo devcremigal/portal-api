@@ -20,7 +20,7 @@ export class Order {
   @JoinColumn({ name: 'userId' })
   user: User;
 
-  @Column()
+  @Column({ type: 'date' })
   date: Date;
 
   @Column({ length: 8 })
@@ -34,7 +34,7 @@ export class Order {
   @JoinColumn({ name: 'deliveryAddressId' })
   deliveryAddress: DeliveryAddress;
 
-  @Column()
+  @Column({ type: 'date' })
   deliveryDate: Date;
 
   @Column({ length: 100 })
